@@ -1,0 +1,14 @@
+query ServiceLinesList {
+  serviceLinesList {
+    items {
+      ... on ServiceLine {
+        id
+        industryId
+        name
+        description
+      }
+    }
+    nextToken
+    scannedCount
+  }
+}

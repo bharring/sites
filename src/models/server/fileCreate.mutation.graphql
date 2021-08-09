@@ -1,0 +1,12 @@
+mutation FileCreate($input: FileCreateInput!) {
+  fileCreate(input: $input) {
+    type
+    name
+    description
+    url
+    metaFields {
+      name
+      value
+    }
+  }
+}

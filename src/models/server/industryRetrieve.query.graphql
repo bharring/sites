@@ -1,0 +1,7 @@
+query IndustryRetrieve($id: ID!) {
+  industryRetrieve(id: $id) {
+    id
+    name
+    description
+  }
+}

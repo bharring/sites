@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<LogoHeader /> renders LogoHeader snapshot 1`] = `
+<ion-row>
+  <ion-col>
+    <ion-text
+      color="primary"
+    >
+      <h1>
+        Application Name
+      </h1>
+    </ion-text>
+  </ion-col>
+</ion-row>
+`;

@@ -1,0 +1,1468 @@
+"""
+Tells the service this field/object has access authorized by an API key.
+"""
+directive @aws_api_key on OBJECT | FIELD_DEFINITION
+
+"""Directs the schema to enforce authorization on a field"""
+directive @aws_auth(
+  """List of cognito user pool groups which have access on this field"""
+  cognito_groups: [String]
+) on FIELD_DEFINITION
+
+"""
+Tells the service this field/object has access authorized by a Cognito User Pools token.
+"""
+directive @aws_cognito_user_pools(
+  """List of cognito user pool groups which have access on this field"""
+  cognito_groups: [String]
+) on OBJECT | FIELD_DEFINITION
+
+"""
+Tells the service this field/object has access authorized by sigv4 signing.
+"""
+directive @aws_iam on OBJECT | FIELD_DEFINITION
+
+"""
+Tells the service this field/object has access authorized by a Lambda Authorizer.
+"""
+directive @aws_lambda on OBJECT | FIELD_DEFINITION
+
+"""
+Tells the service this field/object has access authorized by an OIDC token.
+"""
+directive @aws_oidc on OBJECT | FIELD_DEFINITION
+
+"""
+Tells the service which subscriptions will be published to when this mutation is called. This directive is deprecated use @aws_susbscribe directive instead.
+"""
+directive @aws_publish(
+  """
+  List of subscriptions which will be published to when this mutation is called.
+  """
+  subscriptions: [String]
+) on FIELD_DEFINITION
+
+"""Tells the service which mutation triggers this subscription."""
+directive @aws_subscribe(
+  """
+  List of mutations which will trigger this subscription when they are called.
+  """
+  mutations: [String]
+) on FIELD_DEFINITION
+
+"""This directive allows results to be deferred during execution"""
+directive @defer on FIELD
+
+"""
+The `AWSDateTime` scalar type provided by AWS AppSync, represents a valid ***extended*** [ISO 8601 DateTime](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) string. In other words, this scalar type accepts datetime strings of the form `YYYY-MM-DDThh:mm:ss.SSSZ`.  The scalar can also accept "negative years" of the form `-YYYY` which correspond to years before `0000`. For example, "**-2017-01-01T00:00Z**" and "**-9999-01-01T00:00Z**" are both valid datetime strings.  The field after the two digit seconds field is a nanoseconds field. It can accept between 1 and 9 digits. So, for example, "**1970-01-01T12:00:00.2Z**", "**1970-01-01T12:00:00.277Z**" and "**1970-01-01T12:00:00.123456789Z**" are all valid datetime strings.  The seconds and nanoseconds fields are optional (the seconds field must be specified if the nanoseconds field is to be used).  The [time zone offset](https://en.wikipedia.org/wiki/ISO_8601#Time_zone_designators) is compulsory for this scalar. The time zone offset must either be `Z` (representing the UTC time zone) or be in the format `±hh:mm:ss`. The seconds field in the timezone offset will be considered valid even though it is not part of the ISO 8601 standard.
+"""
+scalar AWSDateTime
+
+"""
+The `AWSJSON` scalar type provided by AWS AppSync, represents a JSON string that complies with [RFC 8259](https://tools.ietf.org/html/rfc8259).  Maps like "**{\\"upvotes\\": 10}**", lists like "**[1,2,3]**", and scalar values like "**\\"AWSJSON example string\\"**", "**1**", and "**true**" are accepted as valid JSON and will automatically be parsed and loaded in the resolver mapping templates as Maps, Lists, or Scalar values rather than as the literal input strings.  Invalid JSON strings like "**{a: 1}**", "**{'a': 1}**" and "**Unquoted string**" will throw GraphQL validation errors.
+"""
+scalar AWSJSON
+
+""" ### SITES ####"""
+type Address {
+  street: String
+
+  """  The full street address."""
+  locality: String
+
+  """  The city or locality."""
+  region: String
+
+  """  The state or region."""
+  postalCode: String
+
+  """  The zip code or postal code."""
+  country: String
+}
+
+input AddressInput {
+  addressee: String
+  street: String
+
+  """  The full street address."""
+  locality: String
+
+  """  The city or locality."""
+  region: String
+
+  """  The state or region."""
+  postalCode: String
+
+  """  The zip code or postal code."""
+  country: String
+}
+
+""" ### ASSETS ####"""
+interface Asset {
+  id: ID!
+  name: String!
+}
+
+type CodeDeliveryDetails {
+  destination: String
+  deliveryMedium: String
+  attributeName: String
+}
+
+type CodeMismatchError implements Error {
+  message: String!
+  username: String
+  code: String
+}
+
+""" ### COMMENTS ####"""
+type Comment {
+  id: String
+  entity_type: String
+  entity_id: String
+  body: String
+  created_at: AWSDateTime
+  created_by: User
+}
+
+input CommentInput {
+  id: String
+  entity_type: String!
+  entity_id: String!
+  body: String!
+}
+
+type CommentResultSuccess {
+  comment: Comment!
+}
+
+""" ### SHARED ####"""
+type DocumentId {
+  id: ID!
+  version_id: ID
+}
+
+enum EntityType {
+  Asset
+  Site
+}
+
+interface Error {
+  message: String!
+}
+
+""" ### Files Service ####"""
+input FileCreateInput {
+  source: String!
+  type: String!
+  name: String!
+  workflowId: String
+  workflowStepContracts: [WorkflowStepContractIdInput]
+  convert: Boolean
+  transcribe: Boolean
+  translate: Boolean
+}
+
+type FileInfo {
+  type: String!
+  name: String!
+  description: String
+  url: String
+  metaFields: [MetaField]
+}
+
+type FileUploadRecord {
+  id: String
+  key: String
+  type: String
+  name: String
+  workflowId: String
+  stepId: String
+  contractName: String
+  url: String
+}
+
+input FileUploadRecordInput {
+  id: String!
+  key: String!
+  type: String!
+  name: String
+  workflowId: String
+  stepId: String
+  contractName: String
+}
+
+enum HttpMethod {
+  GET
+  POST
+  PUT
+  PATCH
+  HEAD
+  OPTIONS
+}
+
+""" ### ARCUS ####"""
+type IndexedDocument {
+  """
+    A JSON map with at least one key-value pair.
+   Keys can only contain letters, numbers, underscores, and dashes.
+   Contents are indexed for searchability.
+  """
+  contents: AWSJSON!
+
+  """
+    Plain-string tags for a document.
+   Queries require at least one tag to be set.
+  """
+  tags: [String!]!
+
+  """
+    This field is only set when searching for documents.
+   Can be used to paginate queries using Elasticsearch search_after search option.
+  """
+  sort: AWSJSON
+
+  """
+    Standard Document Fields
+   Arcus ID
+  """
+  arcus_id: DocumentId!
+
+  """  The GlideCloud Tenant ID which "owns" this document"""
+  tenant_id: ID!
+
+  """  Identifying a GlideCloud Principle"""
+  created_by: ID
+
+  """  Date of creation"""
+  created_at: String!
+
+  """  Identifying a GlideCloud Principle"""
+  updated_by: ID
+
+  """  DateTime of last update"""
+  updated_at: String!
+
+  """  A source string, for deriving an update"""
+  source: String
+
+  """  Only present if accessing a soft-deleted document"""
+  deleted_at: String
+}
+
+input IndexedDocumentInput {
+  """
+    Setting contents always replaces the existing contents.
+   JSONPatch is provided as a convenience for updating existing
+   documents.
+  """
+  contents: AWSJSON
+
+  """
+    Tags are always required for a document, but do not need
+   to be provided in updates.
+   Tags are used to narrow down search results, and label
+   documents with a type name.
+  """
+  tags: [String!]
+
+  """
+    Always applied to the document before persistence, regardless
+   of if it is a PUT or a PATCH.
+   If contents are not set when creating a new document, JSONPatch
+   operations will be applied to an empty map.
+  """
+  jsonpatch_ops: [JsonPatchOp!]
+}
+
+type IndexedDocumentMapping {
+  mapping: AWSJSON!
+}
+
+type IndexedDocumentSearchV1DryRun {
+  """  The QueryLang query string that was provided by the client."""
+  q: String
+
+  """  The QueryLang sort string that was provided by the client."""
+  sort_by: String
+
+  """  JSON-serialized Elasticsearch query generated from inputs."""
+  elastic: AWSJSON!
+}
+
+"""
+  Searches can simply be done on tags, or you can narrow down the
+ search using QueryLang query & sort strings.
+"""
+input IndexedDocumentSearchV1Query {
+  """  QueryLang string for forming the query."""
+  q: String
+
+  """  The QueryLang sort string for setting sort behavior."""
+  sort_by: String
+
+  """  At least one tag for the query."""
+  tags: [String!]!
+
+  """
+    Optionally, the query body to send to Elasticsearch.
+   If a 'query' is set, it will be nested in a boolean query's `must` alongside
+   the injected tenant_id and tags queries.
+  """
+  query: AWSJSON
+}
+
+type IndexedDocumentSearchV1Result {
+  """  The Documents that matched the query."""
+  hits: [IndexedDocument]!
+
+  """
+    Fields forwarded from the Elasticsearch query.
+   Clients might wish to log metadata about their query.
+  """
+  took: AWSJSON!
+  timed_out: AWSJSON!
+}
+
+type IndexedDocumentTag {
+  tag: String!
+  doc_count: AWSJSON!
+}
+
+type IndexedDocumentTags {
+  tags: [IndexedDocumentTag]!
+}
+
+type IndustriesListResultSuccess {
+  items: [Industry]
+  nextToken: String
+  scannedCount: Int
+}
+
+""" ### TASKS ####"""
+type Industry {
+  id: ID!
+  name: String!
+  description: String
+}
+
+input IndustryInput {
+  name: String!
+  description: String
+}
+
+type IndustryResultSuccess {
+  industry: Industry
+}
+
+input JsonPatchOp {
+  op: JsonPatchOpType!
+  path: String
+  from: String
+  value: AWSJSON
+}
+
+enum JsonPatchOpType {
+  add
+  remove
+  replace
+  copy
+  move
+  test
+}
+
+type MetaField {
+  name: String!
+  value: String!
+}
+
+""" ### END NOTIFICATIONS ####"""
+type Mutation {
+  organizationCreate(input: OrganizationCreateInput): Organization
+
+  """  Creates meta-data for a new file and returns pre-signed URL to upload the file directly to S3
+  """
+  fileCreate(input: FileCreateInput!): FileInfo
+  fileUploadRecordCreate(input: FileUploadRecordInput): FileUploadRecord
+
+  """  User management"""
+  userManagement(userRegisterInput: UserRegisterInput, userConfirmationInput: UserConfirmationInput, userPasswordResetInput: UserConfirmationInput): UserManagementResult
+  userCreate(input: UserCreateInput): User
+
+  """  Entity Comments"""
+  commentCreateOrUpdate(input: CommentInput): CommentResultSuccess
+
+  """  ServiceLines"""
+  industryCreate(input: IndustryInput): IndustryResultSuccess
+  serviceLineCreate(input: ServiceLineInput): ServiceLineResultSuccess
+
+  """  Sites"""
+  siteCreate(input: SiteInput): SiteResultSuccess
+  siteUpdate(id: ID!, input: SiteInput): SiteResultSuccess
+
+  """  Tasks"""
+  taskCreate(input: TaskInput): TaskResultSuccess
+  taskUpdate(id: ID!, input: TaskInput): TaskResultSuccess
+  taskDelete(id: ID!): TaskResultSuccess
+
+  """  Creates a Step Definition for the given input"""
+  workflowStepDefinitionCreate(input: WorkflowStepDefinitionInput!): WorkflowStepDefinition!
+
+  """  Updates a Step Definition"""
+  workflowStepDefinitionUpdate(id: ID!, input: WorkflowStepDefinitionInput!): WorkflowStepDefinition!
+
+  """  Updates a Workflow Definition"""
+  workflowDefinitionCreate(input: WorkflowDefinitionInput!): WorkflowDefinition!
+  workflowDefinitionUpdate(id: ID!, input: WorkflowDefinitionInput!): WorkflowDefinition!
+
+  """
+    Initialize a Workflow Tree from a definition with the given ID & type
+   Optionally override the RaciArray for the root definition
+   TODO add recursive functionality for defining more precise RaciArray overrides
+  """
+  workflowProcessDefinitionTreeInitialize(id: ID!, type: WorkflowProcessDefinitionType!, raci_mappings: [RaciArrayRoleMappingInput]!): WorkflowTree!
+
+  """
+    Submit a Command to an initialized Workflow or Step
+   The input's 'id' field represents the ID of the Step or Workflow to target
+   On success, returns the ID of the Workflow or Step that was submitted to
+   Use the workflowTreeDetails query for querying the updated state
+  """
+  workflowCommandSubmit(command: WorkflowCommandInput!): WorkflowCommandOutput!
+  notificationTemplateDefinitionCreate(input: NotificationTemplateDefinitionInput!): NotificationTemplateDefinition!
+  notificationTemplateDefinitionUpdate(id: ID!, input: NotificationTemplateDefinitionInput!): NotificationTemplateDefinition!
+  notificationTemplateDefinitionRender(id: ID!, params: AWSJSON!): NotificationTemplateRenderResult!
+
+  """  Creating and updating Indexed Documents"""
+  indexedDocumentCreate(input: IndexedDocumentInput!): IndexedDocument!
+  indexedDocumentUpdate(id: ID!, input: IndexedDocumentInput!): IndexedDocument!
+}
+
+type NotAuthorizedException implements Error {
+  message: String!
+  username: String
+}
+
+"""  A document representing a persisted Template Definition."""
+type NotificationTemplateDefinition {
+  """  Document Fields"""
+  arcus_id: DocumentId!
+  tenant_id: ID!
+  created_by: ID
+  created_at: String!
+  updated_by: ID
+  updated_at: String!
+  source: String
+  deleted_at: String
+  template_version: NotificationTemplateVersion!
+  html_data: String!
+}
+
+"""  Inputs for creating/updating template definitions."""
+input NotificationTemplateDefinitionInput {
+  template_version: NotificationTemplateVersion!
+  html_data: String!
+}
+
+"""  Result from rendering a Template Definition."""
+type NotificationTemplateRenderResult {
+  html: String!
+}
+
+"""
+ ### END WORKFLOWS ####
+### BEGIN NOTIFICATIONS ####
+ Version of the template renderer to use.
+"""
+enum NotificationTemplateVersion {
+  v1
+}
+
+""" ### Organizations ####"""
+type Organization {
+  id: String!
+  name: String
+  subdomain: String
+}
+
+input OrganizationCreateInput {
+  id: String
+  name: String
+  subdomain: String
+}
+
+type Position {
+  latitude: Float
+  longitude: Float
+  altitude: Float
+}
+
+input PositionInput {
+  latitude: Float
+  longitude: Float
+  altitude: Float
+}
+
+type Query {
+  organizations(ids: [String]!): [Organization]
+  organizationDetails(orgId: String!): Organization
+  filesByWorkflow(workflowId: String!): [FileUploadRecord]
+  fileByStep(workflowId: String!, stepId: String!, name: String!): FileInfo
+  fileByPath(path: String!): FileInfo
+  userInfo(id: String!): User
+  currentUser: User
+
+  """  Comments queries"""
+  comments(entityId: String!): [Comment]
+
+  """  Industry queries"""
+  industryRetrieve(id: ID!): Industry
+  industriesList: IndustriesListResultSuccess
+
+  """  ServiceLine queries"""
+  serviceLineRetrieve(id: ID!): ServiceLine
+  serviceLinesList: ServiceLinesListResultSuccess
+
+  """  Sites queries"""
+  siteRetrieve(id: ID!): Site
+  sitesList: SitesListResultSuccess
+  siteLookup(position: SiteLookupPositionInput, address: SiteLookupAddressInput): SiteLookupResult
+
+  """  Task queries"""
+  taskRetrieve(id: ID!): Task
+  tasksList: TasksListResultSuccess
+
+  """  Process Definition information"""
+  workflowStepDefinitionDetails(id: ID!): WorkflowStepDefinition!
+  workflowProcessDefinitionTree(id: ID!, type: WorkflowProcessDefinitionType!): WorkflowProcessDefinitionTree!
+
+  """
+    Loads the current Workflow Tree state recursively for an identifiable Workflow.
+   Poll this query for the most up-to-date state after a command is successfully
+   submitted.
+  """
+  workflowTreeDetails(id: ID!): WorkflowTree!
+
+  """
+    Paginate WorkflowTrees for reviewing their state and possibly submitting commands
+   to them. All Query search fields are optional, and the cursor should be added to the
+   query for paginating results.
+  """
+  workflowTreeSearch(query: WorkflowTreeSearchQueryInput!): WorkflowTreeSearchPage!
+
+  """  Loads the state for a singular node (i.e. not recursively)"""
+  workflowTreeNodeDetails(id: ID!): WorkflowTree!
+  notificationTemplateDefinitionDetails(id: ID!): NotificationTemplateDefinition!
+  notificationTemplateDefinitionList: [NotificationTemplateDefinition]!
+
+  """  Gets a generic indexed document by ID"""
+  indexedDocumentDetails(id: ID!): IndexedDocument!
+
+  """  Indexed documents search v1 using QueryLang strings"""
+  indexedDocumentSearchV1(query: IndexedDocumentSearchV1Query!): IndexedDocumentSearchV1Result!
+
+  """  Search dry-runs are useful for introspecting on queries generated by QueryLang strings
+  """
+  indexedDocumentSearchV1DryRun(query: IndexedDocumentSearchV1Query!): IndexedDocumentSearchV1DryRun!
+
+  """
+    Returns the Elasticsearch mapping that backs Indexed Documents
+   Useful for understanding dry-run output
+  """
+  indexedDocumentMapping: IndexedDocumentMapping!
+
+  """  Get up to 500 tags in the current tenant. Limitless pagination support will be added in the future. 
+  """
+  indexedDocumentTags: IndexedDocumentTags!
+}
+
+type RaciArray {
+  responsible: [String]!
+  accountable: String!
+  consulted: [String]!
+  informed: [String]!
+  notification_templates: WorkflowRaciNotificationTemplates!
+}
+
+input RaciArrayInput {
+  responsible: [String]
+  accountable: String!
+  consulted: [String]
+  informed: [String]
+  notification_templates: WorkflowRaciNotificationTemplatesInput!
+}
+
+type RaciArrayRoleMapping {
+  role: String!
+  principle_ids: [ID!]!
+}
+
+input RaciArrayRoleMappingInput {
+  role: String!
+  principle_ids: [ID!]!
+}
+
+enum RaciRole {
+  responsible
+  accountable
+  consulted
+  informed
+}
+
+type ServiceLine {
+  id: ID!
+  industryId: String!
+  name: String!
+  description: String
+}
+
+input ServiceLineInput {
+  industryId: String!
+  name: String!
+  description: String
+}
+
+type ServiceLineResultSuccess {
+  serviceLine: ServiceLine
+}
+
+type ServiceLinesListResultSuccess {
+  items: [ServiceLine]!
+  nextToken: String
+  scannedCount: Int
+}
+
+type Site {
+  id: String
+  name: String
+  address: Address
+  position: Position
+}
+
+input SiteInput {
+  name: String
+  address: AddressInput
+  position: PositionInput
+}
+
+input SiteLookupAddressInput {
+  street: String
+
+  """  The full street address"""
+  locality: String
+
+  """  The city or locality"""
+  region: String
+
+  """  the state or region"""
+  postalCode: String
+  addressee: String
+  candidates: Int
+}
+
+type SiteLookupAddressResult {
+  address: Address
+  position: Position
+  addressee: String
+}
+
+type SiteLookupAddressResults {
+  results: [SiteLookupAddressResult]
+}
+
+input SiteLookupPositionInput {
+  latitude: Float
+  longitude: Float
+}
+
+type SiteLookupPositionResult {
+  distance: Float
+  address: Address
+  position: Position
+}
+
+type SiteLookupPositionResults {
+  results: [SiteLookupPositionResult]
+}
+
+union SiteLookupResult = SiteLookupPositionResults | SiteLookupAddressResults
+
+type SiteResultSuccess {
+  site: Site!
+}
+
+type SitesListResultSuccess {
+  items: [Site]
+  nextToken: String
+  scannedCount: Int
+}
+
+input SubjectInput {
+  entityType: EntityType
+  id: ID
+}
+
+type Task {
+  id: String
+
+  """  Sequential numeric ID"""
+  sequence: Int
+  name: String
+  type: TaskType
+  priority: TaskPriority
+  status: TaskStatus
+  serviceLine: ServiceLine
+  description: String
+  subjects: [TaskSubject]
+  workflow: TaskWorkflow
+}
+
+input TaskInput {
+  name: String
+  type: TaskType
+  priority: TaskPriority
+  status: TaskStatus
+  serviceLineId: ID
+  description: String
+  subjects: [SubjectInput]
+  workflow: TaskWorkflowInput
+}
+
+enum TaskPriority {
+  low
+  medium
+  high
+}
+
+type TaskResultSuccess {
+  task: Task
+}
+
+enum TaskStatus {
+  active
+  completed
+  paused
+  canceled
+}
+
+union TaskSubject = Site
+
+enum TaskType {
+  enhancement
+  highlight
+  issue
+}
+
+type TaskWorkflow {
+  id: ID!
+  stepId: ID
+}
+
+input TaskWorkflowInput {
+  id: ID!
+  stepId: ID
+}
+
+type TasksListResultSuccess {
+  items: [Task]!
+  nextToken: String
+  scannedCount: Int
+}
+
+type User implements UserItf {
+  id: String!
+  tenantId: String
+  email: String
+  phone: String
+  firstName: String
+  lastName: String
+  organizations: [UserOrganization]
+}
+
+type UserAlreadyConfirmedError implements Error {
+  message: String!
+  username: String
+}
+
+type UserAlreadyExistsError implements Error {
+  message: String!
+  username: String
+}
+
+type UserConfirmation {
+  username: String!
+  code: String!
+}
+
+type UserConfirmationCodeResendResultSuccess {
+  codeDeliveryDetails: CodeDeliveryDetails!
+}
+
+input UserConfirmationInput {
+  username: String
+  code: String
+  password: String
+  resend: Boolean
+}
+
+type UserConfirmationResultSuccess {
+  userConfirmation: UserConfirmation!
+}
+
+""" ### Users ####"""
+input UserCreateInput {
+  id: String
+  tenantId: String
+  email: String
+  phone: String
+  firstName: String
+  lastName: String
+}
+
+interface UserItf {
+  id: String!
+  tenantId: String
+  email: String
+  phone: String
+  firstName: String
+  lastName: String
+  organizations: [UserOrganization]
+}
+
+union UserManagementResult = UserRegisterResultSuccess | UserConfirmationResultSuccess | UserConfirmationCodeResendResultSuccess | UserPasswordResetResultSuccess | UserAlreadyExistsError | UserAlreadyConfirmedError | UserNotFoundError | CodeMismatchError | NotAuthorizedException
+
+type UserNotFoundError implements Error {
+  message: String!
+  username: String
+}
+
+type UserOrganization {
+  id: String!
+  name: String!
+  subdomain: String
+  roles: [String]
+}
+
+input UserPasswordResetInput {
+  username: String
+  phone: String
+}
+
+type UserPasswordResetResultSuccess {
+  codeDeliveryDetails: CodeDeliveryDetails!
+}
+
+input UserRegisterInput {
+  tenantId: String
+  email: String
+  phone: String
+  password: String
+  firstName: String
+  lastName: String
+  roles: [UserRole]
+}
+
+type UserRegisterResultSuccess {
+  user: User!
+}
+
+enum UserRole {
+  administrator
+  account_manager
+  crew_leader
+  property_manager
+}
+
+"""
+  Represents a Command that can be issued to an initialized Workflow Tree.
+ Depending on the `type`, extra parameters might need to be supplied. Any
+ extra parameters will be supplied through the `type`'s corresponding key
+ in this input.
+"""
+input WorkflowCommandInput {
+  type: WorkflowCommandType!
+  id: ID!
+  submit_step_contract: WorkflowStepContractSubmitInput
+}
+
+"""
+  Simply contains the command object that was casted, validated, and
+ successfully submitted to the corresponding Workflow or Step.
+ Use the workflowTreeNodeDetails query to quickly load the state
+ for the corresponding Workflow Tree node.
+"""
+type WorkflowCommandOutput {
+  command: AWSJSON!
+}
+
+enum WorkflowCommandType {
+  start_step
+  pause_step
+  stop_step
+  complete_step
+  submit_step_contract
+}
+
+interface WorkflowContext {
+  type: WorkflowContextType!
+  name: String!
+}
+
+type WorkflowContextBoolean implements WorkflowContext {
+  type: WorkflowContextType!
+  name: String!
+  boolean: Boolean!
+}
+
+"""  Represents static context that's attached to a Workflow."""
+input WorkflowContextInput {
+  type: WorkflowContextType!
+  name: String!
+  integer: Int
+  string: String
+  boolean: Boolean
+  subcontexts: [WorkflowContextInput!]
+}
+
+type WorkflowContextInteger implements WorkflowContext {
+  type: WorkflowContextType!
+  name: String!
+  integer: Int!
+}
+
+type WorkflowContextNested implements WorkflowContext {
+  type: WorkflowContextType!
+  name: String!
+  subcontexts: [WorkflowContext!]!
+}
+
+type WorkflowContextString implements WorkflowContext {
+  type: WorkflowContextType!
+  name: String!
+  string: String!
+}
+
+enum WorkflowContextType {
+  string
+  boolean
+  integer
+  nested
+}
+
+interface WorkflowContextView {
+  name: String
+}
+
+type WorkflowContract {
+  name: String!
+  template: WorkflowContractTemplate!
+  contract_clauses: [WorkflowContractClause!]!
+  required: Boolean!
+  resubmission_allowed: Boolean!
+  accumulate: Boolean!
+  merge_resubmissions: Boolean!
+}
+
+type WorkflowContractClause {
+  name: String!
+  description: String!
+  type: WorkflowContractClauseType!
+  required: Boolean!
+  validators: [WorkflowContractClauseValidator]!
+}
+
+type WorkflowContractClauseBooleanValidator implements WorkflowContractClauseValidator {
+  type: WorkflowContractClauseValidatorType!
+  boolean: Boolean!
+}
+
+input WorkflowContractClauseInput {
+  name: String!
+  description: String
+  type: WorkflowContractClauseType!
+  required: Boolean
+
+  """
+    Validators have corresponding types that can be applied to
+   Passing validators to a custom ContractClause that do not
+   apply to the clause's ''type' will result in an error on
+   creation.
+  """
+  validators: [WorkflowContractClauseValidatorInput]
+}
+
+type WorkflowContractClauseStringEnumValidator implements WorkflowContractClauseValidator {
+  type: WorkflowContractClauseValidatorType!
+  enums: [String!]!
+}
+
+enum WorkflowContractClauseType {
+  string
+  integer
+  boolean
+  float
+  list_of_string
+  list_of_integer
+  list_of_boolean
+  list_of_float
+}
+
+"""
+ ### WORKFLOWS ####
+ Contract Inputs/Types
+"""
+interface WorkflowContractClauseValidator {
+  """  incase the client wants to use these types, to match with validator inputs
+  """
+  type: WorkflowContractClauseValidatorType!
+}
+
+input WorkflowContractClauseValidatorInput {
+  """  Inputs will be validated based on the type discriminator"""
+  type: WorkflowContractClauseValidatorType!
+
+  """  string_enum"""
+  enums: [String]
+
+  """  boolean_value"""
+  boolean: Boolean
+}
+
+enum WorkflowContractClauseValidatorType {
+  string_enum
+  boolean_value
+}
+
+type WorkflowContractCustomTemplate implements WorkflowContractTemplate {
+  type: WorkflowContractTemplateType!
+  params: AWSJSON
+}
+
+type WorkflowContractFileUploadTemplate implements WorkflowContractTemplate {
+  type: WorkflowContractTemplateType!
+  mutation: String!
+}
+
+type WorkflowContractHttpTemplate implements WorkflowContractTemplate {
+  type: WorkflowContractTemplateType!
+  http_method: HttpMethod!
+  http_path: String!
+  http_host: String
+  http_parameters: [String]
+  http_body: String
+}
+
+input WorkflowContractInput {
+  name: String!
+
+  """  Dynamic input type"""
+  template: WorkflowContractTemplateInput
+
+  """  Defaults to false"""
+  required: Boolean
+
+  """  Defaults to true"""
+  resubmission_allowed: Boolean
+
+  """  Defaults to true"""
+  merge_resubmissions: Boolean
+
+  """
+    Defaults to false.
+   If set to true, resubmission_allowed is always true and merge_resubmissions is always false
+  """
+  accumulate: Boolean
+
+  """  Should only be passed for the 'custom' contract template type"""
+  contract_clauses: [WorkflowContractClauseInput]
+}
+
+interface WorkflowContractTemplate {
+  type: WorkflowContractTemplateType!
+}
+
+input WorkflowContractTemplateInput {
+  """  Inputs will be validated against the corresponding 'type' identifier"""
+  type: WorkflowContractTemplateType!
+
+  """  Custom"""
+  params: AWSJSON
+
+  """  HTTP Template Params"""
+  http_method: HttpMethod
+  http_path: String
+  http_host: String
+  http_parameters: [String]
+  http_body: String
+}
+
+enum WorkflowContractTemplateType {
+  custom
+  http
+  file_upload
+}
+
+type WorkflowDefinition implements WorkflowProcessDefinition {
+  """  Document Fields"""
+  arcus_id: DocumentId!
+  tenant_id: ID!
+  created_by: ID
+  created_at: String!
+  updated_by: ID
+  updated_at: String!
+  source: String
+  deleted_at: String
+
+  """  Process Definition fields"""
+  name: String!
+  description: String!
+  raci_array: RaciArray
+  definition_type: WorkflowProcessDefinitionType!
+  context: WorkflowContext
+  context_views: [WorkflowContextView]
+  template: WorkflowTemplate!
+}
+
+input WorkflowDefinitionInput {
+  name: String
+  description: String
+  raci_array: RaciArrayInput
+  context: WorkflowContextInput
+  template: WorkflowTemplateInput
+}
+
+"""  A union representing the different types of definitions"""
+interface WorkflowProcessDefinition {
+  name: String!
+  description: String!
+  raci_array: RaciArray
+  definition_type: WorkflowProcessDefinitionType!
+  context: WorkflowContext
+  context_views: [WorkflowContextView]
+
+  """
+    Standard Document Fields
+   Arcus ID
+  """
+  arcus_id: DocumentId!
+
+  """  The GlideCloud Tenant ID which "owns" this document"""
+  tenant_id: ID!
+
+  """  Identifying a GlideCloud Principle"""
+  created_by: ID
+
+  """  Date of creation"""
+  created_at: String!
+
+  """  Identifying a GlideCloud Principle"""
+  updated_by: ID
+
+  """  DateTime of last update"""
+  updated_at: String!
+
+  """  A source string, for deriving an update"""
+  source: String
+
+  """  Only present if accessing a soft-deleted document"""
+  deleted_at: String
+}
+
+type WorkflowProcessDefinitionID {
+  id: DocumentId!
+  definition_type: WorkflowProcessDefinitionType
+}
+
+input WorkflowProcessDefinitionIDInput {
+  id: ID!
+  definition_type: WorkflowProcessDefinitionType!
+}
+
+type WorkflowProcessDefinitionTree {
+  definition: WorkflowProcessDefinition
+  children: [WorkflowProcessDefinitionTree]!
+}
+
+enum WorkflowProcessDefinitionType {
+  workflows
+  steps
+}
+
+type WorkflowRaciNotificationTemplateReference {
+  template_id: DocumentId!
+  extra_params: AWSJSON!
+}
+
+input WorkflowRaciNotificationTemplateReferenceInput {
+  template_id: ID!
+  extra_params: AWSJSON
+}
+
+type WorkflowRaciNotificationTemplates {
+  started: [WorkflowRaciNotificationTemplateReference]!
+  completed: [WorkflowRaciNotificationTemplateReference]!
+  paused: [WorkflowRaciNotificationTemplateReference]!
+  cancelled: [WorkflowRaciNotificationTemplateReference]!
+}
+
+input WorkflowRaciNotificationTemplatesInput {
+  started: [WorkflowRaciNotificationTemplateReferenceInput]
+  completed: [WorkflowRaciNotificationTemplateReferenceInput]
+  paused: [WorkflowRaciNotificationTemplateReferenceInput]
+  cancelled: [WorkflowRaciNotificationTemplateReferenceInput]
+}
+
+enum WorkflowStepCompletionTrigger {
+  manual
+  required_completion_contracts
+}
+
+input WorkflowStepContractIdInput {
+  stepId: ID!
+  contractName: String!
+  contract_type: WorkflowStepContractType!
+}
+
+"""
+  The name of the contract (always unique within a step), its `type`, and the
+ parameters map to submit for the contract. Each key in the parameters map is the
+ `name` of one of the contract's clauses (always unique within a contract).
+"""
+input WorkflowStepContractSubmitInput {
+  name: String!
+  parameters: AWSJSON!
+  contract_type: WorkflowStepContractType!
+}
+
+enum WorkflowStepContractType {
+  completion
+  startup
+}
+
+type WorkflowStepDefinition implements WorkflowProcessDefinition {
+  """  Document Fields"""
+  arcus_id: DocumentId!
+  tenant_id: ID!
+  created_by: ID
+  created_at: String!
+  updated_by: ID
+  updated_at: String!
+  source: String
+  deleted_at: String
+
+  """  Process Definition fields"""
+  name: String!
+  description: String!
+  raci_array: RaciArray
+  definition_type: WorkflowProcessDefinitionType!
+  context: WorkflowContext
+  context_views: [WorkflowContextView]
+
+  """
+    Step-specific fields
+   Triggers describe how & when a Step should start & complete
+  """
+  startup_triggers: [WorkflowStepStartupTrigger!]!
+  completion_triggers: [WorkflowStepCompletionTrigger!]!
+
+  """  Contracts describe data inputs that might be required for completing the step
+  """
+  startup_contracts: [WorkflowContract]!
+  completion_contracts: [WorkflowContract]!
+}
+
+"""
+  Supports partial inputs for updates, i.e. fields that are not desired
+ to be updated can not be set in the mutation.
+ However this means that GraphQL types might not reflect required inputs
+ for creating a Workflow Step Definition.
+"""
+input WorkflowStepDefinitionInput {
+  name: String!
+  description: String
+  context: WorkflowContextInput
+  raci_array: RaciArrayInput
+  startup_triggers: [WorkflowStepStartupTrigger]
+  completion_triggers: [WorkflowStepCompletionTrigger]
+
+  """
+    Contract Names must be unique in any list of Contracts
+   Contracts can be partially updated, e.g. if the step has
+   3 contracts, then [{"name":"contract1"},{"name":"contract2","required":true}]
+   will ensure that 'contract1' is left unchanged whereas 'contract2' sets "required" to true
+  """
+  startup_contracts: [WorkflowContractInput]
+  completion_contracts: [WorkflowContractInput]
+}
+
+enum WorkflowStepStartupTrigger {
+  manual
+  required_startup_contracts
+}
+
+interface WorkflowTemplate {
+  type: WorkflowTemplateType!
+}
+
+input WorkflowTemplateInput {
+  type: WorkflowTemplateType!
+  manual_steps: WorkflowTemplateManualStepsInput
+}
+
+type WorkflowTemplateManualSteps implements WorkflowTemplate {
+  type: WorkflowTemplateType!
+  child_identifiers: [WorkflowProcessDefinitionID!]!
+}
+
+input WorkflowTemplateManualStepsInput {
+  child_identifiers: [WorkflowProcessDefinitionIDInput!]!
+}
+
+enum WorkflowTemplateType {
+  manual_steps
+}
+
+type WorkflowTree {
+  """  Same as WorkflowProcessDefinitionTree"""
+  definition: WorkflowProcessDefinition!
+  children: [WorkflowTree]!
+  id: ID!
+  root_id: ID!
+  parent_id: ID
+  raci_array: RaciArray
+  raci_mappings: [RaciArrayRoleMapping]!
+  projections: AWSJSON!
+  state: WorkflowTreeState!
+  state_history: [WorkflowTreeState!]!
+}
+
+input WorkflowTreeAggregationInput {
+  """  A unique, client-provided name to correlate results"""
+  name: String!
+
+  """  The kind of aggregation to use"""
+  kind: WorkflowTreeAggregationType!
+
+  """  Should be provided if the 'kind' option has extra config options"""
+  config: AWSJSON
+}
+
+enum WorkflowTreeAggregationType {
+  current_state
+}
+
+type WorkflowTreeSearchPage {
+  data: [WorkflowTree]!
+
+  """
+    Cursor to pass in the QueryInput for the next page of results.
+   The exact same query must be passed except for the cursor in
+   order for pagination to work as expected.
+  """
+  cursor: String
+
+  """
+    A map of aggregation name to Elasticsearch aggregations.
+   At time of writing this is forwarded directly from the Elasticsearch API..
+   The service should likely formalize this type at some point
+   for better dev UX.
+  """
+  aggregations: AWSJSON
+}
+
+input WorkflowTreeSearchQueryInput {
+  """  Defaults to all states, unless list is provided"""
+  states: [WorkflowTreeState]
+
+  """  Load Trees that were initialized from a specific Definition"""
+  definition_ids: [ID]
+
+  """  Search for WorkflowTrees of a specific process type."""
+  definition_types: [WorkflowProcessDefinitionType]
+
+  """  Search for trees with specific roles in their RACI array."""
+  raci_role_assignments: [WorkflowTreeSearchRaciRoleAssignmentInput]
+
+  """  Search for trees that have been assigned to specific principles."""
+  raci_mapping_assignments: [WorkflowTreeSearchRaciMappingAssignmentInput]
+
+  """
+    Indicates whether the trees should be loaded recursively.
+   Note that this does NOT apply to the search query itself
+   and is only a convenience for loading full trees in the matches.
+  """
+  recursive: Boolean
+
+  """  !!! DEPRECATED !!! Prefer using `sort`."""
+  sort_by: WorkflowTreeSearchQuerySortBy
+
+  """  !!! DEPRECATED !!! Prefer using `sort`."""
+  order: WorkflowTreeSearchQueryOrder
+
+  """
+    Sort the output by custom parameters. Each subsequent element
+   of the given list is a tiebreaker for the previous element.
+   Takes precedence if set with deprecated `sort_by` and `order` fields.
+   Defaults to `[{field: updated_at, order: desc}]`
+  """
+  sort: [WorkflowTreeSearchSortInput]
+
+  """  The number of WorkflowTrees to return, defaults to 10"""
+  limit: Int
+
+  """  Used to paginate results"""
+  cursor: String
+
+  """
+    Aggregation API
+   Any search with at least one aggregation will return 0 hits
+  """
+  aggs: [WorkflowTreeAggregationInput]
+}
+
+enum WorkflowTreeSearchQueryOrder {
+  asc
+  desc
+}
+
+enum WorkflowTreeSearchQuerySortBy {
+  updated_at
+  state
+}
+
+input WorkflowTreeSearchRaciMappingAssignmentInput {
+  """  Search for workflows with the given principle IDs assigned."""
+  principle_ids: [ID!]!
+
+  """
+    Narrow down the search by looking for specific roles the
+   given principle IDs have been assigned to.
+  """
+  role_names: [String!]
+}
+
+input WorkflowTreeSearchRaciRoleAssignmentInput {
+  """
+    Role names that have been assigned to any of
+   the given RACI roles.
+  """
+  role_names: [String!]!
+
+  """  Defaults to all roles if not set."""
+  raci_roles: [RaciRole!]
+}
+
+input WorkflowTreeSearchSortInput {
+  field: WorkflowTreeSearchQuerySortBy!
+  order: WorkflowTreeSearchQueryOrder!
+}
+
+enum WorkflowTreeState {
+  stopped
+  completed
+  cancelled
+  initialized
+  waiting
+  started
+  paused
+}

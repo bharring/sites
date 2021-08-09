@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SiteListItem /> renders snapshot full address 1`] = `
+<ion-label>
+  <h2>
+    Site Name
+  </h2>
+  <h3>
+    street, locality, region postalCode
+  </h3>
+</ion-label>
+`;
+
+exports[`<SiteListItem /> renders snapshot missing address 1`] = `
+<ion-label>
+  <h2>
+    Site Name
+  </h2>
+</ion-label>
+`;
+
+exports[`<SiteListItem /> renders snapshot missing properties 1`] = `<ion-label />`;

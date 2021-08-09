@@ -1,0 +1,9 @@
+mutation IndustryCreate($input: IndustryInput) {
+  industryCreate(input: $input) {
+    industry {
+      id
+      name
+      description
+    }
+  }
+}

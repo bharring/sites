@@ -1,0 +1,24 @@
+mutation ConfirmUser($userConfirmationInput: UserConfirmationInput) {
+  userManagement(userConfirmationInput: $userConfirmationInput) {
+    ... on UserConfirmationResultSuccess {
+      __typename
+      userConfirmation {
+        code
+        username
+      }
+    }
+    ... on CodeMismatchError {
+      username
+      code
+      message
+    }
+    ... on UserNotFoundError {
+      message
+      username
+    }
+    ... on NotAuthorizedException {
+      message
+      username
+    }
+  }
+}

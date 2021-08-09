@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SitesHeader /> matches snapshot 1`] = `
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons
+      slot="start"
+    >
+      <ion-menu-button />
+    </ion-buttons>
+    <ion-title>
+      Page Title
+    </ion-title>
+    <ion-buttons
+      slot="primary"
+    >
+      <ion-button
+        data-testid="button"
+        onClick={[Function]}
+        slot="end"
+      >
+        <ion-icon
+          icon="icon"
+        />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+`;

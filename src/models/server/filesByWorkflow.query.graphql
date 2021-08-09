@@ -1,0 +1,12 @@
+query FilesByWorkflow($workflowId: String!) {
+  filesByWorkflow(workflowId: $workflowId) {
+    id
+    key
+    type
+    name
+    workflowId
+    stepId
+    contractName
+    url
+  }
+}

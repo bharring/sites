@@ -1,0 +1,28 @@
+mutation RegisterUser($userRegisterInput: UserRegisterInput!) {
+  userManagement(userRegisterInput: $userRegisterInput) {
+    ... on UserRegisterResultSuccess {
+      user {
+        id
+        tenantId
+        email
+        phone
+        firstName
+        lastName
+        organizations {
+          id
+          name
+          subdomain
+          roles
+        }
+      }
+    }
+    ... on NotAuthorizedException {
+      message
+      username
+    }
+    ... on UserAlreadyExistsError {
+      message
+      username
+    }
+  }
+}

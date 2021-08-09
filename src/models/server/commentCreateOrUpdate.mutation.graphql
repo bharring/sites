@@ -1,0 +1,25 @@
+mutation CommentCreateOrUpdate($input: CommentInput) {
+  commentCreateOrUpdate(input: $input) {
+    comment {
+      id
+      entity_type
+      entity_id
+      body
+      created_at
+      created_by {
+        id
+        tenantId
+        email
+        phone
+        firstName
+        lastName
+        organizations {
+          id
+          name
+          subdomain
+          roles
+        }
+      }
+    }
+  }
+}

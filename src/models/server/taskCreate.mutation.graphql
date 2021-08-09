@@ -1,0 +1,40 @@
+mutation TaskCreate($input: TaskInput) {
+  taskCreate(input: $input) {
+    task {
+      id
+      sequence
+      name
+      type
+      priority
+      serviceLine {
+        id
+        industryId
+        name
+        description
+      }
+      description
+      subjects {
+        ... on Site {
+          id
+          name
+          address {
+            street
+            locality
+            region
+            postalCode
+            country
+          }
+          position {
+            latitude
+            longitude
+            altitude
+          }
+        }
+      }
+      workflow {
+        id
+        stepId
+      }
+    }
+  }
+}

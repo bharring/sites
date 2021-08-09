@@ -1,0 +1,13 @@
+query IndustriesList {
+  industriesList {
+    items {
+      ... on Industry {
+        id
+        name
+        description
+      }
+    }
+    nextToken
+    scannedCount
+  }
+}

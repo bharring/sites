@@ -1,0 +1,20 @@
+mutation SiteCreate($input: SiteInput) {
+  siteCreate(input: $input) {
+    site {
+      id
+      name
+      address {
+        street
+        locality
+        region
+        postalCode
+        country
+      }
+      position {
+        latitude
+        longitude
+        altitude
+      }
+    }
+  }
+}

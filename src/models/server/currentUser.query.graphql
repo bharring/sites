@@ -1,0 +1,16 @@
+query CurrentUser {
+  currentUser {
+    email
+    firstName
+    id
+    lastName
+    phone
+    tenantId
+    organizations {
+      id
+      name
+      roles
+      subdomain
+    }
+  }
+}

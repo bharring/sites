@@ -1,0 +1,10 @@
+mutation serviceLineCreate($input: ServiceLineInput) {
+  serviceLineCreate(input: $input) {
+    serviceLine {
+      id
+      industryId
+      name
+      description
+    }
+  }
+}

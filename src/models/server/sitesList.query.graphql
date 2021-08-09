@@ -1,0 +1,22 @@
+query SitesList {
+  sitesList {
+    items {
+      id
+      name
+      address {
+        street
+        locality
+        region
+        postalCode
+        country
+      }
+      position {
+        latitude
+        longitude
+        altitude
+      }
+    }
+    nextToken
+    scannedCount
+  }
+}

@@ -1,0 +1,8 @@
+query ServiceLineRetrieve($id: ID!) {
+  serviceLineRetrieve(id: $id) {
+    id
+    industryId
+    name
+    description
+  }
+}
